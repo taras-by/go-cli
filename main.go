@@ -7,11 +7,18 @@ import (
 	"github.com/mitchellh/cli"
 )
 
+var (
+	Name    = "Go Cli App"
+	Version = "1.0.0"
+)
+
 func main() {
-	c := cli.NewCLI("app", "1.0.0")
+	c := cli.NewCLI(Name, Version)
 	c.Args = os.Args[1:]
 	c.Commands = map[string]cli.CommandFactory{
-		"foo": fooCommandFactory,
+		"foo": func() (command cli.Command, err error) {
+			return &FooCommand{}, err
+		},
 		"bar": barCommandFactory,
 	}
 
@@ -23,12 +30,16 @@ func main() {
 	os.Exit(exitStatus)
 }
 
-func fooCommandFactory() (command cli.Command, err error) {
-	return &FooCommand{
-		SomeProperty: "value",
-	}, nil
-}
-
 func barCommandFactory() (command cli.Command, err error) {
-	return &FooCommand{}, nil
+
+	mapConfig := map[string]string{
+		"name1": "value1",
+		"name2": "value2",
+	}
+	stringConfig := "value3"
+
+	return &BarCommand{
+		mapConfig,
+		stringConfig,
+	}, nil
 }
